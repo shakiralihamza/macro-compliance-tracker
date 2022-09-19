@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {FC, useEffect} from 'react';
-import {Button, Stack, TextField} from "@mui/material";
+import {Stack, TextField} from "@mui/material";
 import {macroType} from "../pages";
 
 enum macroTypeValues {
@@ -99,7 +99,6 @@ const MctForm: FC<MCTFormProps> = ({handleChange, name, data}) => {
                            style={inputStyles}
                            onChange={(e) => handleInput(e)}
                 />
-                <Button variant={'contained'}>Save</Button>
             </Stack>
         </>
     );

@@ -8,6 +8,7 @@ interface ResultProps {
 }
 
 type BackGroundType = 'success' | 'error' | 'info';
+
 const Result: FC<ResultProps> = ({result}) => {
     const [background, setBackground] = React.useState<BackGroundType>('success');
 

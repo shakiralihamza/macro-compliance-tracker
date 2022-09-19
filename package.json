@@ -14,11 +14,15 @@
     "@mui/icons-material": "^5.10.3",
     "@mui/material": "^5.10.5",
     "eslint": "8.22.0",
+    "mongodb": "^4.10.0",
+    "mongoose": "^6.6.1",
     "next": "12.3.0",
+    "next-connect": "^0.13.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@types/mongodb": "^4.0.7",
     "@types/node": "18.7.18",
     "@types/react": "18.0.20",
     "@types/react-dom": "18.0.6",
