@@ -7,6 +7,7 @@ import {Button, Container, Grid, Tab, Tabs, Typography} from "@mui/material";
 import Result from "../components/result";
 import MCTForm from "../components/MCTForm";
 import React, {useEffect, useState} from "react";
+import {server} from "../config";
 
 
 export type macroDetails = {
@@ -23,8 +24,25 @@ export interface macroType {
     protein: macroDetails
 }
 
+interface macroTypeProp {
+    date: string,
+    macro: macroType
+}
+
+const saveMacro = async (data: macroTypeProp) => {
+    const res = await fetch(`${server}/api/daily`, {
+        method: 'post',
+        body: JSON.stringify(data)
+    });
+    return await res.json();
+};
+
+const getMacro = async (date: string) => {
+    const res = await fetch(`${server}/api/daily?date=${date}`);
+    return await res.json();
+}
 const Home: NextPage = (props) => {
-    const [data, setData] = useState<macroType | null>(null);
+    const [data, setData] = useState<macroTypeProp | null>(null);
     const [saving, setSaving] = React.useState(false);
     const [menu, setMenu] = React.useState(1);
 
@@ -44,30 +62,34 @@ const Home: NextPage = (props) => {
         let resultMacro = name.split(" ")[1].toLowerCase();
 
         // @ts-ignore
-        _data[resultMacro][resultType] = value;
+        _data.macro[resultMacro][resultType] = value;
 
         // @ts-ignore
         setData(_data);
     }
 
-    const handleMenuChange = async (date: string, menu: number) => {
-        const res = await fetch(`http://localhost:3000/api/daily?date=${date}`);
-        res.json().then(res => {
-            setData(res);
-            setMenu(menu);
-        })
+    const handleMenuChange = (date: string, menu: number) => {
+        getMacro(date)
+            .then((data) => {
+                setData(data);
+                setMenu(menu);
+            })
+            .catch((error) => {
+                console.log('API error', error)
+            })
     };
 
-    const handleSave = async () => {
+    const handleSave = () => {
         setSaving(true);
-        const res = await fetch('http://localhost:3000/api/daily', {
-            method: 'post',
-            body: JSON.stringify(data)
-        });
-        res.json().then(res => {
-            console.log(res)
-            setSaving(false);
-        });
+        if (data) {
+            saveMacro(data)
+                .then(() => {
+                    setSaving(false);
+                })
+                .catch((error) => {
+                    console.log('API error', error)
+                })
+        }
     }
     return (
         <>
@@ -75,7 +97,7 @@ const Home: NextPage = (props) => {
                 <title>Macro Compliance Tracker</title>
             </Head>
             {
-                data &&
+                data && data.macro &&
                 <Container maxWidth={'lg'}>
                     <Grid container justifyContent={'center'} alignItems={'center'} spacing={2} my={3}>
                         <Grid item xs={12}>
@@ -89,31 +111,31 @@ const Home: NextPage = (props) => {
 
                     <Grid container justifyContent={'center'} alignItems={'center'} spacing={2} my={3}>
                         <Grid item xs={3}>
-                            <Result result={data.calories}/>
+                            <Result result={data.macro.calories}/>
                         </Grid>
                         <Grid item xs={3}>
-                            <Result result={data.fat}/>
+                            <Result result={data.macro.fat}/>
                         </Grid>
                         <Grid item xs={3}>
-                            <Result result={data.carbs}/>
+                            <Result result={data.macro.carbs}/>
                         </Grid>
                         <Grid item xs={3}>
-                            <Result result={data.protein}/>
+                            <Result result={data.macro.protein}/>
                         </Grid>
                     </Grid>
 
                     <Grid container justifyContent={'center'} alignItems={'center'} spacing={10}>
                         <Grid item xs={'auto'}>
                             <Typography variant={'h5'} mb={2}>Calories</Typography>
-                            <MCTForm data={data} name={'total'} handleChange={handleDataChange}/>
+                            <MCTForm data={data.macro} name={'total'} handleChange={handleDataChange}/>
                         </Grid>
                         <Grid item xs={'auto'}>
                             <Typography variant={'h5'} mb={2}>Target</Typography>
-                            <MCTForm data={data} name={'target'} handleChange={handleDataChange}/>
+                            <MCTForm data={data.macro} name={'target'} handleChange={handleDataChange}/>
                         </Grid>
                         <Grid item xs={'auto'}>
                             <Typography variant={'h5'} mb={2}>Variance</Typography>
-                            <MCTForm data={data} name={'variant'} handleChange={handleDataChange}/>
+                            <MCTForm data={data.macro} name={'variant'} handleChange={handleDataChange}/>
                         </Grid>
                         <Grid item xs={12}>
                             <Button variant={'contained'} disabled={saving} onClick={handleSave}>Save</Button>
@@ -128,7 +150,7 @@ const Home: NextPage = (props) => {
 export const getServerSideProps: GetServerSideProps = async () => {
     //date today
     const date = new Date().toISOString().split('T')[0];
-    const res = await fetch(`http://localhost:3000/api/daily?date=${date}`);
+    const res = await fetch(`${server}/api/daily?date=${date}`);
     const json = await res.json();
     return {
         props: {

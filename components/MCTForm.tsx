@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {FC, useEffect} from 'react';
 import {Stack, TextField} from "@mui/material";
 import {macroType} from "../pages";
@@ -35,7 +34,7 @@ const MctForm: FC<MCTFormProps> = ({handleChange, name, data}) => {
         setCarbs(data[macroTypeValues.carbs][name]);
         // @ts-ignore
         setProtein(data[macroTypeValues.protein][name]);
-    },[]);
+    },[data, name]);
     const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = e.target;
         const _name = name.split(' ')[1];

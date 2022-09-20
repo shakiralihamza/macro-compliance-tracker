@@ -8,10 +8,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const {date} = req.query;
     const dataModel = {
         "date": date,
-        "calories": {"label": "Calories", "total": 0, "target": 0, "variant": 0},
-        "carbs": {"label": "Carbs", "total": 0, "target": 0, "variant": 0},
-        "fat": {"label": "Fat", "total": 0, "target": 0, "variant": 0},
-        "protein": {"label": "Protein", "total": 0, "target": 0, "variant": 0}
+        "macro": {
+            "calories": {"label": "Calories", "total": 0, "target": 0, "variant": 0},
+            "carbs": {"label": "Carbs", "total": 0, "target": 0, "variant": 0},
+            "fat": {"label": "Fat", "total": 0, "target": 0, "variant": 0},
+            "protein": {"label": "Protein", "total": 0, "target": 0, "variant": 0}
+        }
     }
     const client = await clientPromise;
     const db = client.db("mct");
@@ -19,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case "POST":
             let data = req.body;
             data = JSON.parse(data);
-            data.date = new Date().toISOString().split('T')[0]
+            console.log(data);
             await db.collection('daily').updateOne(
                 {date: data.date},
                 {$set: data},
@@ -30,10 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case "GET":
             let daily;
             if (date) {
-                console.log(date);
-                // @ts-ignore
                 daily = await db.collection("daily").findOne({date});
-                console.log(daily);
                 if (daily == null) {
                     daily = dataModel
                 }
@@ -43,7 +42,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     daily = dataModel
                 }
             }
-            res.json(daily);
+
+            //not including "_id" in the response:
+            const toResponse = {
+                "date": daily.date,
+                "macro": daily.macro
+            }
+            res.json(toResponse);
             break;
     }
 }
