@@ -37,8 +37,9 @@ const Result: FC<ResultProps> = ({result}) => {
                     <Grid item>
                         <Typography variant={'h4'}>{result.total}</Typography>
                     </Grid>
-                    <Grid item xs>
-                        <Stack direction={'row'} spacing={5} alignItems={'center'}>
+                    <Grid item xs sx={{width: '100%'}}>
+                        <Stack direction={'row'} alignItems={'center'}
+                               justifyContent={{xs: 'space-between', md: 'space-around'}}>
                             <Typography variant={'body2'}>{result.target - result.variant}</Typography>
                             <Typography variant={'body1'} fontWeight={'bold'}>{result.target}</Typography>
                             <Typography variant={'body2'}>{result.target + result.variant}</Typography>
