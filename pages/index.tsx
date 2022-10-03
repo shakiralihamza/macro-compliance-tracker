@@ -76,6 +76,7 @@ const Home: NextPage = (props) => {
             .then((data) => {
                 setData(data);
                 setMenu(menu);
+                setChangesMade(false);
             })
             .catch((error) => {
                 console.log('API error', error)
